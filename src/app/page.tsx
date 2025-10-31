@@ -1,9 +1,13 @@
-const page = () => {
+import HeroSection from "../components/HeroSection"
+import NavBar from "../components/NavBar"
+
+const LandingPage = () => {
   return (
-    <div className="text-3xl font-bold underline">
-      Hello World
+    <div className="min-h-screen px-6 md:px-8 lg:px-16">
+      <NavBar/>
+      <HeroSection/>
     </div>
   )
 }
 
-export default page
+export default LandingPage
