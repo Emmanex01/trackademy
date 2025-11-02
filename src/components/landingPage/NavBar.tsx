@@ -23,10 +23,10 @@ const NavBar = () => {
                     Teach on EduFlow
                 </li>
                 <li className='flex gap-2'>
-                    <Link href="/">
+                    <Link href="/login">
                         <button className='btn bg-base-100'>Login</button>
                     </Link>
-                    <Link href="/">
+                    <Link href="/signup">
                         <button className='btn btn-neutral'>Sign Up</button>
                     </Link>
                 </li>
