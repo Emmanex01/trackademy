@@ -18,7 +18,7 @@ const Categories = () => {
             courseCount: 19
         },
         {
-            icon: <Laptop size={48} className='p-2 bg-amber-50 rounded-lg'/>,
+            icon: <DraftingCompass size={48} className='p-2 bg-amber-50 rounded-lg'/>,
             name: 'Design',
             courseCount: 10
         },
@@ -32,7 +32,7 @@ const Categories = () => {
       <div className='grid gap-2 md:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-4 mt-6'>
         {/* Categories List - Placeholder */}
         {categories.map((category, index) => (
-            <div key={index} className='bg-gray-400 flex flex-col items-center p-6 rounded-lg  my-4'>
+            <div key={index} className='bg-gray-200 flex flex-col items-center p-6 rounded-lg  my-4'>
                 {category.icon}
                 <h3 className='font-semibold text-xl'>{category.name}</h3>
                 <p className='text-sm'>{category.courseCount} Courses</p>
