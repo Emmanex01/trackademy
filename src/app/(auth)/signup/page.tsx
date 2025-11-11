@@ -1,6 +1,12 @@
-import React from 'react'
+'use client'
+import { useActionState } from 'react'
+import { signup } from '../../actions/auth'
+import { FormState } from '@/lib/definitions';
+
+const initialState: FormState = { errors: {} };
 
 const SignUp = () => {
+  const [state, action, pending] = useActionState(signup, initialState);
   return (
     <div>
       <div className='container mx-auto'>
@@ -12,7 +18,7 @@ const SignUp = () => {
           <h1 className='text-center text-4xl font-semibold'>Join EduFlow</h1>
           <p className='text-center my-2'>Create your account to start learning</p>
 
-          <form className='w-lg mx-auto my-8'>
+          <form action={action} className='w-lg mx-auto my-8'>
             <div className='mb-5'>
               <label className='mb-2 block font-semibold' htmlFor="usertype">I am a</label>
               <select className='block w-full px-4 py-2 bg-gray-300 rounded outline-0' name="usertype" id="usertype">
@@ -22,23 +28,25 @@ const SignUp = () => {
             </div>
 
             <div className='mb-5'>
-              <label className='block mb-2 font-semibold' htmlFor="full-name">Full name</label>
+              <label className='block mb-2 font-semibold' htmlFor="name">Full name</label>
               <div className='flex align-middle gap-3 w-full px-4 py-2 bg-gray-300 rounded outline-0'>
                 <div className='h-full flex align-bottom'>
                   <i className='bxrds  bx-user'></i>
                 </div>
-                <input type="text" placeholder='Full name' />
+                <input type="text" id="name" name="name" placeholder='Full name' />
               </div>
+              {state?.errors?.name && <p className='text-red-400'>{state.errors.name}</p>}
             </div>
 
             <div className='mb-5'>
-              <label className='block mb-2 font-semibold' htmlFor="full-name">Email</label>
+              <label className='block mb-2 font-semibold' htmlFor="email">Email</label>
               <div className='flex align-middle gap-3 w-full px-4 py-2 bg-gray-300 rounded outline-0'>
                 <div className='h-full flex align-bottom'>
                   <i className='bxrds  bx-envelope'    ></i>
                 </div>
-                <input type="text" placeholder='Enter your email' />
+                <input id="email" name="email" type="email" placeholder='Enter your email' />
               </div>
+              {state?.errors?.email && <p className='text-red-400' >{state.errors.email}</p>}
             </div>
 
 
@@ -48,8 +56,9 @@ const SignUp = () => {
                 <div className='h-full flex align-bottom'>
                   <i className='bxrds  bx-phone'    ></i>
                 </div>
-                <input type="tel" placeholder='+234 XX XXXX XXXX' />
+                <input type="tel" id='phone' name='phone' placeholder='+234 XX XXXX XXXX' />
               </div>
+              {state?.errors?.phone && <p className='text-red-400' >{state.errors.phone}</p>}
             </div>
 
 
@@ -59,17 +68,27 @@ const SignUp = () => {
                 <div className='h-full flex align-bottom'>
                   <i className='bxrds bx-lock h-fit'></i>
                 </div>
-                <input type="password" />
+                <input id="password" name="password" type="password" />
               </div>
+              {state?.errors?.password && (
+                <div className='text-red-400 flex'>
+                  <p>Password must:</p>
+                  <ul>
+                    {state.errors.password.map((error) => (
+                      <li key={error}>- {error}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
 
             <div>
-              <label className='block mb-2 font-semibold' htmlFor="password">Confirm Password</label>
+              <label className='block mb-2 font-semibold' htmlFor="confirm-password">Confirm Password</label>
               <div className='flex align-middle gap-3 w-full px-4 py-2 bg-gray-300 rounded outline-0'>
                 <div className='h-full flex align-bottom'>
                   <i className='bxrds bx-lock h-fit'></i>
                 </div>
-                <input type="password" />
+                <input id='confirm-password' name='confirm-password' type="password" />
               </div>
             </div>
 
@@ -80,7 +99,7 @@ const SignUp = () => {
             </div>
 
             <div className='my-8'>
-              <button className='block w-full text-center text-white bg-black p-2 rounded-lg mb-5'>
+              <button disabled={pending} type="submit" className='block w-full text-center text-white bg-black p-2 rounded-lg mb-5'>
                 Sign in
               </button>
 
