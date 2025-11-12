@@ -1,3 +1,4 @@
+import { Session } from 'inspector/promises';
 import { use } from 'react'
 import * as z from 'zod'
  
@@ -35,3 +36,9 @@ export type FormState = {
   };
   success?: boolean;
 };
+
+export type SessionPayload = {
+  sessionId: number;
+  role: 'STUDENT' | 'TEACHER';
+  expiresAt: Date;
+}

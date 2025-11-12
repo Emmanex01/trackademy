@@ -1,12 +1,24 @@
 'use client'
-import { useActionState } from 'react'
+import { useActionState, useEffect } from 'react'
 import { signup } from '../../actions/auth'
 import { FormState } from '@/lib/definitions';
+import { useRouter } from 'next/navigation';
+
 
 const initialState: FormState = { errors: {} };
 
+
 const SignUp = () => {
+  const router = useRouter();
   const [state, action, pending] = useActionState(signup, initialState);
+
+   // ✅ When signup succeeds, redirect manually
+    useEffect(() => {
+      if (state?.success) {
+        router.push('/student');
+      }
+    }, [state, router]);
+
   return (
     <div>
       <div className='container mx-auto'>
