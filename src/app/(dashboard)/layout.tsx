@@ -12,7 +12,7 @@ const dashboardLayout = ({children}: {children : React.ReactNode}) => {
         <div className='w-4/5 p-6'>
           <header>
             <div className='flex justify-between '>
-              <h1 className='font-medium text-4xl'>Hello Sophia</h1>
+              <h1 className='font-medium text-4xl'>Hello User</h1>
               <div className='flex items-center gap-2'>
                 <div className='flex items-center rounded-lg p-2 gap-1 bg-gray-300'>
                   <Search className='text-gray-400'/>
