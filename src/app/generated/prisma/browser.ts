@@ -23,7 +23,67 @@ export * from './enums';
  */
 export type User = Prisma.UserModel
 /**
+ * Model Student
+ * 
+ */
+export type Student = Prisma.StudentModel
+/**
+ * Model Teacher
+ * 
+ */
+export type Teacher = Prisma.TeacherModel
+/**
  * Model Session
  * 
  */
 export type Session = Prisma.SessionModel
+/**
+ * Model StudentStats
+ * 
+ */
+export type StudentStats = Prisma.StudentStatsModel
+/**
+ * Model Course
+ * 
+ */
+export type Course = Prisma.CourseModel
+/**
+ * Model Lesson
+ * 
+ */
+export type Lesson = Prisma.LessonModel
+/**
+ * Model Enrollment
+ * 
+ */
+export type Enrollment = Prisma.EnrollmentModel
+/**
+ * Model LessonProgress
+ * 
+ */
+export type LessonProgress = Prisma.LessonProgressModel
+/**
+ * Model Goal
+ * 
+ */
+export type Goal = Prisma.GoalModel
+/**
+ * Model ActivityLog
+ * 
+ */
+export type ActivityLog = Prisma.ActivityLogModel
+/**
+ * Model Achievement
+ * 
+ */
+export type Achievement = Prisma.AchievementModel
+/**
+ * Model StudentAchievement
+ * 
+ */
+export type StudentAchievement = Prisma.StudentAchievementModel
+/**
+ * Model Resource
+ * 
+ */
+export type Resource = Prisma.ResourceModel

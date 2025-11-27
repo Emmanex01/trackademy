@@ -8,7 +8,6 @@ export default function StudentLayout({
 }) {
   return (
     <div className="student-layout">
-      <nav>Student Navbar</nav>
       <main>{children}</main>
     </div>
   );

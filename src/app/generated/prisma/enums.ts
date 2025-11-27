@@ -9,6 +9,15 @@
 * 🟢 You can import this file directly.
 */
 
+export const ResourceType = {
+  pdf: 'pdf',
+  video: 'video',
+  recording: 'recording'
+} as const
+
+export type ResourceType = (typeof ResourceType)[keyof typeof ResourceType]
+
+
 export const Role = {
   ADMIN: 'ADMIN',
   TEACHER: 'TEACHER',

@@ -9,5 +9,17 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/User'
+export type * from './models/Student'
+export type * from './models/Teacher'
 export type * from './models/Session'
+export type * from './models/StudentStats'
+export type * from './models/Course'
+export type * from './models/Lesson'
+export type * from './models/Enrollment'
+export type * from './models/LessonProgress'
+export type * from './models/Goal'
+export type * from './models/ActivityLog'
+export type * from './models/Achievement'
+export type * from './models/StudentAchievement'
+export type * from './models/Resource'
 export type * from './commonInputTypes'

@@ -1,5 +1,5 @@
 'use server'
-import { SignupFormSchema, FormState } from '../../lib/definitions'
+import { SignupFormSchema, FormState, LoginFormSchema } from '../../lib/definitions'
 import bcrypt from 'bcrypt'
 import prisma from "@/lib/prisma";
 import { Role } from '../generated/prisma/enums';
@@ -78,4 +78,53 @@ export async function signup(state: FormState, formData: FormData): Promise<Form
 export async function logout() {
   await deleteSession()
   redirect('/login')
+}
+
+export async function login(state: FormState, formData: FormData): Promise<FormState> {
+  try {
+    // Validate form fields
+    const ValidatedFields = LoginFormSchema.safeParse({
+      usertype: formData.get('usertype'),
+      email: formData.get('email'),
+      password: formData.get('password'),
+    });
+
+    // 1️⃣ Validation failed
+    if (!ValidatedFields.success) {
+      return {
+        errors: ValidatedFields.error.flatten().fieldErrors,
+      };
+    }
+
+    const { usertype, email, password } = ValidatedFields.data;
+
+    // 2️⃣ Check if user exists
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return { errors: { email: ['No account found with this email.'] } };
+    }
+    // 3️⃣ Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return { errors: { password: ['Incorrect password.'] } };
+    }
+    // 4️⃣ Verify user role
+    const expectedRole = usertype === 'teacher' ? Role.TEACHER : Role.STUDENT;  
+    if (user.role !== expectedRole) {
+      return { errors: { usertype: ['User role does not match.'] } };
+    }
+    // 5️⃣ Create user session
+    await createSession(user.id);
+    return { success: true };
+  } catch (error) {
+    console.error('Error during login:', error);
+    return {
+      errors: {
+        general: ['An unexpected error occurred. Please try again later.'],
+      },
+    };
+  }
 }

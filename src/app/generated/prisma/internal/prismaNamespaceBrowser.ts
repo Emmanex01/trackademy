@@ -50,7 +50,19 @@ export const AnyNull = runtime.objectEnumValues.instances.AnyNull
 
 export const ModelName = {
   User: 'User',
-  Session: 'Session'
+  Student: 'Student',
+  Teacher: 'Teacher',
+  Session: 'Session',
+  StudentStats: 'StudentStats',
+  Course: 'Course',
+  Lesson: 'Lesson',
+  Enrollment: 'Enrollment',
+  LessonProgress: 'LessonProgress',
+  Goal: 'Goal',
+  ActivityLog: 'ActivityLog',
+  Achievement: 'Achievement',
+  StudentAchievement: 'StudentAchievement',
+  Resource: 'Resource'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -83,6 +95,22 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const StudentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId'
+} as const
+
+export type StudentScalarFieldEnum = (typeof StudentScalarFieldEnum)[keyof typeof StudentScalarFieldEnum]
+
+
+export const TeacherScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId'
+} as const
+
+export type TeacherScalarFieldEnum = (typeof TeacherScalarFieldEnum)[keyof typeof TeacherScalarFieldEnum]
+
+
 export const SessionScalarFieldEnum = {
   id: 'id',
   sessionToken: 'sessionToken',
@@ -92,6 +120,120 @@ export const SessionScalarFieldEnum = {
 } as const
 
 export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
+
+
+export const StudentStatsScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  streak: 'streak',
+  activeCourses: 'activeCourses',
+  weeklyHours: 'weeklyHours',
+  avgScore: 'avgScore'
+} as const
+
+export type StudentStatsScalarFieldEnum = (typeof StudentStatsScalarFieldEnum)[keyof typeof StudentStatsScalarFieldEnum]
+
+
+export const CourseScalarFieldEnum = {
+  id: 'id',
+  courseName: 'courseName',
+  summary: 'summary',
+  teacherId: 'teacherId'
+} as const
+
+export type CourseScalarFieldEnum = (typeof CourseScalarFieldEnum)[keyof typeof CourseScalarFieldEnum]
+
+
+export const LessonScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  author: 'author',
+  videoUrl: 'videoUrl',
+  date: 'date',
+  duration: 'duration',
+  isLive: 'isLive',
+  courseId: 'courseId'
+} as const
+
+export type LessonScalarFieldEnum = (typeof LessonScalarFieldEnum)[keyof typeof LessonScalarFieldEnum]
+
+
+export const EnrollmentScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  courseId: 'courseId'
+} as const
+
+export type EnrollmentScalarFieldEnum = (typeof EnrollmentScalarFieldEnum)[keyof typeof EnrollmentScalarFieldEnum]
+
+
+export const LessonProgressScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  lessonId: 'lessonId',
+  progress: 'progress',
+  completed: 'completed',
+  score: 'score'
+} as const
+
+export type LessonProgressScalarFieldEnum = (typeof LessonProgressScalarFieldEnum)[keyof typeof LessonProgressScalarFieldEnum]
+
+
+export const GoalScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  progress: 'progress',
+  studentId: 'studentId',
+  description: 'description',
+  targetDate: 'targetDate'
+} as const
+
+export type GoalScalarFieldEnum = (typeof GoalScalarFieldEnum)[keyof typeof GoalScalarFieldEnum]
+
+
+export const ActivityLogScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  activity: 'activity',
+  timestamp: 'timestamp'
+} as const
+
+export type ActivityLogScalarFieldEnum = (typeof ActivityLogScalarFieldEnum)[keyof typeof ActivityLogScalarFieldEnum]
+
+
+export const AchievementScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  icon: 'icon'
+} as const
+
+export type AchievementScalarFieldEnum = (typeof AchievementScalarFieldEnum)[keyof typeof AchievementScalarFieldEnum]
+
+
+export const StudentAchievementScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  achievementId: 'achievementId',
+  awardedAt: 'awardedAt'
+} as const
+
+export type StudentAchievementScalarFieldEnum = (typeof StudentAchievementScalarFieldEnum)[keyof typeof StudentAchievementScalarFieldEnum]
+
+
+export const ResourceScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  categories: 'categories',
+  type: 'type',
+  author: 'author',
+  rating: 'rating',
+  icon: 'icon',
+  courseId: 'courseId'
+} as const
+
+export type ResourceScalarFieldEnum = (typeof ResourceScalarFieldEnum)[keyof typeof ResourceScalarFieldEnum]
 
 
 export const SortOrder = {

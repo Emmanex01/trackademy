@@ -24,17 +24,153 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   sessions  Session[]
+  //relations
+  student   Student?
+  teacher   Teacher?
+}
+
+model Student {
+  id           String               @id @default(cuid())
+  userId       Int                  @unique
+  user         User                 @relation(fields: [userId], references: [id])
+  stats        StudentStats?
+  enrollments  Enrollment[]
+  progresses   LessonProgress[]
+  goals        Goal[]
+  activities   ActivityLog[]
+  achievements StudentAchievement[]
+}
+
+model Teacher {
+  id     String @id @default(cuid())
+  userId Int    @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  courses Course[]
 }
 
 model Session {
-  id           Int       @id @default(autoincrement())
-  sessionToken String    @unique
+  id           Int      @id @default(autoincrement())
+  sessionToken String   @unique
   userId       Int
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt    DateTime  @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
   expiresAt    DateTime
 }
 
+model StudentStats {
+  id            String @id @default(cuid())
+  studentId     String @unique
+  streak        Int    @default(0)
+  activeCourses Int    @default(0)
+  weeklyHours   Int    @default(0)
+  avgScore      Float  @default(0)
+
+  student Student @relation(fields: [studentId], references: [id])
+}
+
+model Course {
+  id         String  @id @default(cuid())
+  courseName String
+  summary    String?
+  teacherId  String
+  teacher    Teacher @relation(fields: [teacherId], references: [id])
+
+  lessons     Lesson[]
+  enrollments Enrollment[]
+  resources   Resource[]
+}
+
+model Lesson {
+  id       String   @id @default(cuid())
+  title    String
+  author   String
+  videoUrl String?
+  date     DateTime
+  duration Int // in minutes
+  isLive   Boolean  @default(false)
+  courseId String
+
+  course   Course           @relation(fields: [courseId], references: [id])
+  progress LessonProgress[]
+}
+
+model Enrollment {
+  id        String @id @default(cuid())
+  studentId String
+  courseId  String
+
+  student Student @relation(fields: [studentId], references: [id])
+  course  Course  @relation(fields: [courseId], references: [id])
+}
+
+model LessonProgress {
+  id        String  @id @default(cuid())
+  studentId String
+  lessonId  String
+  progress  Int     @default(0)
+  completed Boolean @default(false)
+  score     Float?
+
+  student Student @relation(fields: [studentId], references: [id])
+  lesson  Lesson  @relation(fields: [lessonId], references: [id])
+}
+
+model Goal {
+  id          String   @id @default(cuid())
+  title       String
+  progress    Int      @default(0)
+  studentId   String
+  description String
+  targetDate  DateTime
+
+  student Student @relation(fields: [studentId], references: [id])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  studentId String
+  activity  String
+  timestamp DateTime @default(now())
+  student   Student  @relation(fields: [studentId], references: [id])
+}
+
+model Achievement {
+  id                  String               @id @default(cuid())
+  name                String
+  description         String
+  icon                String
+  studentAchievements StudentAchievement[]
+}
+
+model StudentAchievement {
+  id            String      @id @default(cuid())
+  studentId     String
+  achievementId String
+  awardedAt     DateTime    @default(now())
+  student       Student     @relation(fields: [studentId], references: [id])
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+}
+
+model Resource {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  categories  String[]
+  type        String?
+  author      String?
+  rating      Float?
+  icon        String?
+  courseId    String?
+
+  course Course? @relation(fields: [courseId], references: [id])
+}
+
+enum ResourceType {
+  pdf
+  video
+  recording
+}
 
 enum Role {
   ADMIN
