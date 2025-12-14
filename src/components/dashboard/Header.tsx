@@ -9,8 +9,8 @@ interface headerProp  {
 
 const Header = ({name, description} : headerProp) => {
   return (
-    <header>
-        <div className='flex justify-between '>
+    <header className='mb-4'>
+        <div className='flex justify-between mb-2'>
             <h1 className='font-medium text-4xl'>{name}</h1>
             <div className='flex items-center gap-2'>
             <div className='flex items-center rounded-lg p-2 gap-1 bg-gray-300'>
@@ -25,12 +25,12 @@ const Header = ({name, description} : headerProp) => {
                 <Bell/>
                 <span className='absolute w-5 h-5 text-sm flex items-center justify-center -top-1 -right-1 rounded-full bg-red-400'>0</span>
             </Link>
-            <Link href='/profile' className='bg-gray-800 text-gray-200 p-2 rounded-full'>
+            <Link href='/dashboard/profile' className='bg-gray-800 text-gray-200 p-2 rounded-full'>
                 <User/>
             </Link>
             </div>
         </div>
-        <p>{description}</p>
+        <p className='text-sm'>{description}</p>
     </header>
   )
 }

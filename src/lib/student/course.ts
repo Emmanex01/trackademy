@@ -1,6 +1,7 @@
 import prisma  from "@/lib/prisma";
+import { getUser } from "../dal";
 
-export async function getStudentDashboard(userId: number) {
+export async function getStudentDashboard(userId: number | undefined) {
   // Fetch all enrollment + course + lesson progress data
   const student = await prisma.student.findUnique({
     where: { userId },
@@ -83,7 +84,7 @@ export async function getStudentDashboard(userId: number) {
   };
 }
 
-export default async function getStudentCourses(userId: number) {
+export default async function getStudentCourses(userId: number | undefined) {
   const student = await prisma.student.findUnique({
     where: { userId },
     include: {

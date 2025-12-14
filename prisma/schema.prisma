@@ -27,6 +27,23 @@ model User {
   //relations
   student   Student?
   teacher   Teacher?
+  profile   Profile?
+}
+
+model Profile {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id])
+  bio       String?
+  avatarUrl String?
+  firstName String?
+  lastName  String? 
+  location  String?
+  phoneNumber String?
+  email     String?
+  level     String?
+  discipline String?
+  university String?
 }
 
 model Student {
@@ -45,7 +62,6 @@ model Teacher {
   id     String @id @default(cuid())
   userId Int    @unique
   user   User   @relation(fields: [userId], references: [id])
-
   courses Course[]
 }
 
@@ -75,7 +91,8 @@ model Course {
   summary    String?
   teacherId  String
   teacher    Teacher @relation(fields: [teacherId], references: [id])
-
+  duration    Int
+  startDate   DateTime
   lessons     Lesson[]
   enrollments Enrollment[]
   resources   Resource[]

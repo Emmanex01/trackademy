@@ -13,7 +13,7 @@ const Login = () => {
 
   useEffect(() => {
     if (state?.success) {
-      router.push('/teacher');
+      router.push('/dashboard');
     }
   }, [state, router]);
 

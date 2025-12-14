@@ -1,11 +1,14 @@
-import Header from '@/components/dashboard/Header'
-import React from 'react'
+import { getUser } from "@/lib/dal"
+import Profile from "./_components/Profile"
+import prisma from "@/lib/prisma";
+import { refresh } from "@/app/actions/profileForm";
 
-const profilepage = () => {
+const profilepage = async () => {
+  
+  const userProfile = await refresh();
+  
   return (
-    <div>
-      <Header name='Hello Sophia' description='Welcome to your dashboard'/>
-    </div>
+    <Profile userProfile={userProfile}/>
   )
 }
 

@@ -1,48 +1,61 @@
-import ProfileForm from '@/components/profiles/Form'
-import { Award, Book, Camera, GraduationCap } from 'lucide-react'
-import React from 'react'
+'use client';
+import { ArrowLeft, Camera, Save } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import ProfileForm from '@/components/profiles/Form';
 
-const EditProfile = () => {
+const EditProfilePage = () => {
+  const router = useRouter();
+
   return (
-    <div className='h-screen flex flex-col md:flex-row gap-2'>
-      <div className='w-1/3 text-center'>
-        <div className='bg-gray-900 flex flex-col items-center text-white  gap-6 py-12'>
-            <div className='h-34 w-34 rounded-full bg-gray-300 relative'>
-                <Camera size={35} className='absolute bottom-0 right-0'/>
-            </div>
-            <h2 className='text-2xl font-medium'>Sophia Johnson</h2>
-            <div className='flex py-1 px-3 bg-gray-100 text-black gap-3 rounded-lg'>
-                <GraduationCap/>
-                Student 
-            </div>
-            <div className='text-sm space-y-2'>
-                <p>University of Lagos</p>
-                <p>Mass Communication</p>
-                <p>300 level</p>
-            </div>
-        </div>
-        <div className='grid grid-cols-2 gap-4 mt-8 font-semibold'>
-            <div className='flex flex-col items-center p-4 bg-gray-300 rounded-lg gap-2'>
-                <div className='bg-gray-900 text-white p-2'>
-                   <Award/> 
-                </div>
-                <p>6</p>
-                <p>Certificate</p>
-            </div>
-            <div className='flex flex-col items-center p-4 bg-gray-300 rounded-lg gap-2'>
-                <div className='bg-gray-900 text-white p-2'>
-                   <Book/> 
-                </div>
-                <p>12</p>
-                <p>Courses Enrolled</p>
-            </div>
-        </div>
+    <div className="min-h-screen bg-gray-100 p-8">
+      {/* Header */}
+      <div className="flex items-center gap-4 mb-6">
+        <button
+          onClick={() => router.back()}
+          className="p-2 rounded-md bg-white shadow hover:bg-gray-50"
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <h1 className="text-3xl font-semibold">Edit Profile</h1>
       </div>
-      <div className='w-2/3 bg-gray-300 rounded-lg'>
-        <ProfileForm/>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Left: Avatar */}
+        <div className="bg-gray-200 rounded-lg shadow p-6 flex flex-col items-center gap-4">
+          <div className="relative w-32 h-32 rounded-full bg-gray-300 flex items-center justify-center">
+            <Camera className="absolute bottom-2 right-2 bg-black text-white p-1 rounded-full" />
+          </div>
+          <p className="text-sm text-gray-500">
+            Profile photo upload (coming soon)
+          </p>
+        </div>
+
+        {/* Right: Form */}
+        <div className="md:col-span-2 bg-gray-300 rounded-lg shadow p-6">
+          <ProfileForm />
+
+          {/* Actions */}
+          <div className="flex justify-end gap-3 mt-6">
+            <button
+              onClick={() => router.push('/dashboard/profile')}
+              className="px-4 py-2 rounded-md border"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              form="profile-form"
+              className="px-4 py-2 rounded-md bg-blue-600 text-white flex items-center gap-2"
+            >
+              <Save size={16} />
+              Save Changes
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default EditProfile
+export default EditProfilePage;

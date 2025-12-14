@@ -1,19 +1,17 @@
+'use server'
 import 'server-only'
- 
 import { cookies } from 'next/headers'
 import { decrypt } from '@/lib/session'
 import { cache } from 'react'
-import { redirect } from 'next/navigation'
 import prisma from './prisma'
- 
 export const verifySession = cache(async () => {
   const cookie = (await cookies()).get('session')?.value
   console.log('Cookie in verifySession:', cookie) // Debugging line
   const session = await decrypt(cookie)
   console.log('Decrypted session:', session) // Debugging line
   if (!session?.sessionId) {
-    // redirect('/login')
     console.log('No valid session found')
+    // redirect('/login')
     return { isAuth: false }
   }
   console.log('Session ID found:', session.sessionId) // Debugging line

@@ -1,8 +1,19 @@
 import Link from 'next/link'
 import { Search } from 'lucide-react';
+import { getUser, verifySession } from '@/lib/dal';
+import UserMenu from '@/app/_components/UserDropDownMenus';
+import { logout } from '@/app/actions/auth';
 
 
-const NavBar = () => {
+const NavBar = async () => {
+    const session = await verifySession();
+      console.log('Dashboard Layout Session:', session); // Debugging line
+       const user = await getUser();
+          console.log("User in Dashboard Page:", user); // Debugging line
+        const userRole = user?.role?.toLowerCase();
+        console.log("User Role:", userRole); // Debugging line
+        console.log("Is Authenticated:", session?.isAuth); // Debugging line
+        if (!session) return null;
   return (
     <header className='w-full'>
         <nav className='w-full py-4'>
@@ -22,14 +33,17 @@ const NavBar = () => {
                 <li className='hidden md:flex'>
                     Teach on EduFlow
                 </li>
-                <li className='flex gap-2'>
-                    <Link href="/login">
-                        <button className='btn bg-base-100'>Login</button>
-                    </Link>
-                    <Link href="/signup">
-                        <button className='btn btn-neutral'>Sign Up</button>
-                    </Link>
-                </li>
+                    {
+                        session.isAuth ? <UserMenu user={user} onLogout={logout}/> : 
+                            <li className='flex gap-2'>
+                                <Link href="/login">
+                                    <button className='btn bg-base-100'>Login</button>
+                                </Link>
+                                <Link href="/signup">
+                                    <button className='btn btn-neutral'>Sign Up</button>
+                                </Link>
+                            </li>
+                 }
             </ul>
         </nav>
     </header>

@@ -1,3 +1,4 @@
+import ToastProvider from './_components/ToastProvider';
 import './globals.css';
 
 export default function RootLayout({
@@ -8,7 +9,9 @@ export default function RootLayout({
   return (
     <html data-theme="cupcake">
       <body>
-       {children}
+       <ToastProvider>
+          {children}
+      </ToastProvider>
       </body>
    </html>
   );

@@ -5,79 +5,105 @@ import prisma from "@/lib/prisma";
 import { Role } from '../generated/prisma/enums';
 import { createSession, deleteSession } from '@/lib/session';
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 
-export async function signup(state: FormState, formData: FormData): Promise<FormState> {
+export async function signup(
+  state: FormState,
+  formData: FormData
+): Promise<FormState> {
   try {
-    // Validate form fields
     const validatedFields = SignupFormSchema.safeParse({
-      usertype: formData.get('usertype'),
-      name: formData.get('name'),
-      email: formData.get('email'),
-      phone: formData.get('phone'),
-      password: formData.get('password'),
+      usertype: formData.get("usertype"),
+      name: formData.get("name"),
+      email: formData.get("email"),
+      phone: formData.get("phone"),
+      password: formData.get("password"),
     });
 
-    // 1️⃣ Validation failed
     if (!validatedFields.success) {
       return {
         errors: validatedFields.error.flatten().fieldErrors,
       };
     }
 
-    const { usertype, name, email, phone, password } = validatedFields.data;
+    const { usertype, name, email, phone, password } =
+      validatedFields.data;
 
-    // 2️⃣ Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
 
     if (existingUser) {
-      return { errors: { email: ['This email is already in use.'] } };
+      return { errors: { email: ["Email already in use"] } };
     }
 
-    // 3️⃣ Hash password and create user
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user in the database
-    const newUser = await prisma.user.create({
+    // 1️⃣ Create User
+    const user = await prisma.user.create({
       data: {
         name,
         email,
         phone,
         password: hashedPassword,
-        role: usertype === 'teacher' ? Role.TEACHER : Role.STUDENT,
-      },
-      select: {
-        id: true,
+        role:
+          usertype === "teacher"
+            ? Role.TEACHER
+            : Role.STUDENT,
       },
     });
 
-    const user = newUser.id
- 
-    if (!user) {
-      return {
-        errors: { general: ['Failed to create user. Please try again.'] },
-      }
+    // 2️⃣ Create profile based on role
+    if (user.role === Role.TEACHER) {
+      await prisma.teacher.create({
+        data: { userId: user.id },
+      });
+
+      await prisma.profile.create({
+        data: {
+          userId: user.id,
+          firstName: name,
+          email: email,
+          phoneNumber: phone,
+        },
+      });
     }
 
-     // 4. Create user session
-    await createSession(newUser.id);
-    // 5. Return success state
-    return { success: true };
-    
+    if (user.role === Role.STUDENT) {
+      await prisma.student.create({
+        data: { userId: user.id },
+      });
+
+      await prisma.profile.create({
+        data: {
+          userId: user.id,
+          firstName: name,
+          email: email,
+          phoneNumber: phone,
+        },
+      });
+    }
+
+    // 3️⃣ Create session
+    await createSession(user.id);
+
+    return { success: true, message: "Signup successful!" };
   } catch (error) {
-    console.error('Error during signup:', error);
+    console.error("Signup error:", error);
+
     return {
       errors: {
-        general: ['An unexpected error occurred. Please try again later.'],
+        general: ["Something went wrong. Please try again."],
       },
     };
   }
 }
+
  
 export async function logout() {
-  await deleteSession()
-  redirect('/login')
+  const cookieStore = await cookies();
+  cookieStore.delete({ name: "session", path: "/" });
+  return redirect("/");
 }
 
 export async function login(state: FormState, formData: FormData): Promise<FormState> {

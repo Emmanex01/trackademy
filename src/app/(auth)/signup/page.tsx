@@ -15,7 +15,7 @@ const SignUp = () => {
    // ✅ When signup succeeds, redirect manually
     useEffect(() => {
       if (state?.success) {
-        router.push('/student');
+        router.push('/dashboard');
       }
     }, [state, router]);
 

@@ -1,9 +1,8 @@
 import ChatBox from '@/components/dashboard/ChatBox'
 import Header from '@/components/dashboard/Header'
-import prisma from '@/lib/prisma'
 import getStudentCourses from '@/lib/student/course'
 import { CardSim, Download, MessageCircle, Notebook, Play, User2 } from 'lucide-react'
-import React from 'react'
+
 
 type PageProps = {
   params: {

@@ -13,6 +13,13 @@ const encodedKey = new TextEncoder().encode(secretKey)
 
  
 export async function createSession(userId: number) {
+
+  // get actual user role
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { role: true },
+  });
+  
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     // 1. Generate a session token
   const sessionToken = randomBytes(32).toString('hex');
@@ -24,7 +31,7 @@ export async function createSession(userId: number) {
   const sessionId = sessionData.id;
 
    // 3. Encrypt the session ID
-  const session = await encrypt({ sessionId, expiresAt, role: 'STUDENT' });
+  const session = await encrypt({ sessionId, expiresAt, role: user?.role ?? "STUDENT" });
 
     // 4. Set the session cookie
   const cookieStore = await cookies()
