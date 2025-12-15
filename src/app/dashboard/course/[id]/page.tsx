@@ -1,24 +1,22 @@
 import ChatBox from '@/components/dashboard/ChatBox'
 import Header from '@/components/dashboard/Header'
+import { getUser } from '@/lib/dal'
 import getStudentCourses from '@/lib/student/course'
 import { CardSim, Download, MessageCircle, Notebook, Play, User2 } from 'lucide-react'
 
 
-type PageProps = {
-  params: {
-    id: string;   // <-- type your route param here
-  };
-};
-const ProductManagementPage = async ({params}: PageProps) => {
+const ProductManagementPage = async ({params}: { params: Promise<{ id: string }> }) => {
+
      const {id} = await params;
-     const courses = await getStudentCourses(1);
+     const user = await getUser();
+     const courses = await getStudentCourses(user?.id);
       // Find the specific course
   const course = courses.find((e) => e.id === id);
 
   // If course not found, show 404
   if (!course) {
     console.error(`Course with id ${id} not found.`);
-    return <div>Course not found</div>;
+    return <div className='font-bold text-2xl text-center'>Course not found</div>;
   }
 
   console.log('Found course:', course);
