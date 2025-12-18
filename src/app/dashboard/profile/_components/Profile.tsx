@@ -44,7 +44,7 @@ const Profile = ({ userProfile}: Props) => {
             <p className='text-sm'>Manage your account settings and personal information</p>
         </header>
           <div className='h-screen flex flex-col md:flex-row gap-2'>
-          <div className='w-1/3 text-center'>
+          <div className='w-full md:w-1/3 text-center'>
             <div className='bg-gray-900 flex flex-col items-center text-white  gap-6 py-12'>
                 <div className='h-34 w-34 rounded-full bg-gray-300 relative'>
                     <Camera size={35} className='absolute bottom-0 right-0'/>
@@ -77,7 +77,7 @@ const Profile = ({ userProfile}: Props) => {
                 </div>
             </div>
           </div>
-          <div className='w-2/3 bg-gray-300 rounded-lg'>
+          <div className='w-full md:w-2/3 bg-gray-300 rounded-lg'>
             <ProfileForm 
                 userProfile={userProfile}
                 isEditing={isEditing}

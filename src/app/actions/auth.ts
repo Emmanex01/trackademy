@@ -7,96 +7,79 @@ import { createSession, deleteSession } from '@/lib/session';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 
+
 export async function signup(
   state: FormState,
   formData: FormData
 ): Promise<FormState> {
-  try {
-    const validatedFields = SignupFormSchema.safeParse({
-      usertype: formData.get("usertype"),
-      name: formData.get("name"),
-      email: formData.get("email"),
-      phone: formData.get("phone"),
-      password: formData.get("password"),
-    });
+  const validatedFields = SignupFormSchema.safeParse(Object.fromEntries(formData.entries()));
 
-    if (!validatedFields.success) {
-      return {
-        errors: validatedFields.error.flatten().fieldErrors,
-      };
-    }
-
-    const { usertype, name, email, phone, password } =
-      validatedFields.data;
-
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (existingUser) {
-      return { errors: { email: ["Email already in use"] } };
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // 1️⃣ Create User
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        phone,
-        password: hashedPassword,
-        role:
-          usertype === "teacher"
-            ? Role.TEACHER
-            : Role.STUDENT,
-      },
-    });
-
-    // 2️⃣ Create profile based on role
-    if (user.role === Role.TEACHER) {
-      await prisma.teacher.create({
-        data: { userId: user.id },
-      });
-
-      await prisma.profile.create({
-        data: {
-          userId: user.id,
-          firstName: name,
-          email: email,
-          phoneNumber: phone,
-        },
-      });
-    }
-
-    if (user.role === Role.STUDENT) {
-      await prisma.student.create({
-        data: { userId: user.id },
-      });
-
-      await prisma.profile.create({
-        data: {
-          userId: user.id,
-          firstName: name,
-          email: email,
-          phoneNumber: phone,
-        },
-      });
-    }
-
-    // 3️⃣ Create session
-    await createSession(user.id);
-
-    return { success: true, message: "Signup successful!" };
-  } catch (error) {
-    console.error("Signup error:", error);
-
+  if (!validatedFields.success) {
     return {
-      errors: {
-        general: ["Something went wrong. Please try again."],
-      },
+      errors: validatedFields.error.flatten().fieldErrors,
     };
   }
+
+  const { usertype, name, email, phone, password } = validatedFields.data;
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Use a transaction to ensure either EVERYTHING saves or NOTHING saves
+    const newUser = await prisma.$transaction(async (tx) => {
+      // 1. Check if user exists (or let the create fail if email is unique)
+      const existingUser = await tx.user.findUnique({ where: { email } });
+      if (existingUser) {
+        throw new Error("EMAIL_EXISTS");
+      }
+
+      // 2. Create User
+      const user = await tx.user.create({
+        data: {
+          name,
+          email,
+          phone,
+          password: hashedPassword,
+          role: usertype === "teacher" ? Role.TEACHER : Role.STUDENT,
+        },
+      });
+
+      // 3. Create Role-Specific Record
+      if (user.role === Role.TEACHER) {
+        await tx.teacher.create({ data: { userId: user.id } });
+      } else {
+        await tx.student.create({ data: { userId: user.id } });
+      }
+
+      // 4. Create Profile (Common for both)
+      await tx.profile.create({
+        data: {
+          userId: user.id,
+          firstName: name, // Note: You might want to split name into first/last
+          email: email,
+          phoneNumber: phone,
+        },
+      });
+
+      return user;
+    });
+
+    // Create session AFTER transaction succeeds
+    await createSession(newUser.id);
+
+  } catch (error: any) {
+    if (error.message === "EMAIL_EXISTS") {
+      return { errors: { email: ["Email already in use"] } };
+    }
+    
+    console.error("Signup error:", error);
+    return {
+      errors: { general: ["Something went wrong. Please try again."] },
+    };
+  }
+
+  // Redirect or return success (Redirect must be outside try/catch)
+  redirect("/dashboard"); 
 }
 
  

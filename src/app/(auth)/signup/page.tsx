@@ -1,147 +1,201 @@
-'use client'
-import { useActionState, useEffect } from 'react'
-import { signup } from '../../actions/auth'
-import { FormState } from '@/lib/definitions';
-import { useRouter } from 'next/navigation';
+"use client";
 
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect } from "react"; // Import useEffect
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-const initialState: FormState = { errors: {} };
+import { signup } from "../../actions/auth";
+import { SignupFormSchema, SignupFormValues } from "@/lib/definitions";
 
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "react-toastify";
 
-const SignUp = () => {
+const initialState = {
+  message: "",
+  errors: {},
+};
+
+export default function SignUp() {
   const router = useRouter();
+  // useActionState (formerly useFormState) handles the result of the server action
   const [state, action, pending] = useActionState(signup, initialState);
 
-   // ✅ When signup succeeds, redirect manually
-    useEffect(() => {
-      if (state?.success) {
-        router.push('/dashboard');
-      }
-    }, [state, router]);
+  const form = useForm<SignupFormValues>({
+    resolver: zodResolver(SignupFormSchema),
+    defaultValues: {
+      usertype: "student",
+      name: "",
+      email: "",
+      phone: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
+
+  useEffect(() => {
+  if (state?.errors) {
+    Object.entries(state.errors).forEach(([field, message]) => {
+      // Cast to any key of your form
+      form.setError(field as any, {
+        type: "server",
+        message: Array.isArray(message)
+          ? message.join(", ")
+          : (message as string),
+      });
+    });
+  }
+
+  // 2. Handle Success
+  // Assuming your server action returns { success: true } or similar
+  if (state?.success) {
+    toast.success("Account created!"); // Optional
+    router.push("/dashboard"); // Redirect user
+  }
+}, [state, form]);
+
+
+  // 2. The Logic to Submit
+  const onSubmit = (data: SignupFormValues) => {
+    // Because RHF manages state via JSON, but Server Actions (via useActionState) 
+    // expect FormData, we must convert it manually.
+    const formData = new FormData();
+    
+    Object.entries(data).forEach(([key, value]) => {
+    // Only append if value is valid (skip null/undefined)
+    if (value !== undefined && value !== null) {
+      formData.append(key, value as string); 
+    }
+  });
+
+    // Manually trigger the server action
+    action(formData);
+  };
 
   return (
-    <div>
-      <div className='container mx-auto'>
-        <div className='container bg-black h-70'>
+    <div className="container mx-auto">
+      <h1 className="text-center text-4xl font-semibold">Join EduFlow</h1>
 
-        </div>
+      <Form {...form}>
+        {/* 3. Remove action={action}. Use only onSubmit={form.handleSubmit(onSubmit)} */}
+        <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-lg mx-auto space-y-6">
 
-        <div className='my-5'>
-          <h1 className='text-center text-4xl font-semibold'>Join EduFlow</h1>
-          <p className='text-center my-2'>Create your account to start learning</p>
+          {/* ... All your FormFields remain exactly the same ... */}
+          
+          <FormField
+            control={form.control}
+            name="usertype"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>I am a</FormLabel>
+                <FormControl>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger>
+                      <SelectValue aria-placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="student">Student</SelectItem>
+                      <SelectItem value="teacher">Teacher</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-          <form action={action} className='w-lg mx-auto my-8'>
-            <div className='mb-5'>
-              <label className='mb-2 block font-semibold' htmlFor="usertype">I am a</label>
-              <select className='block w-full px-4 py-2 bg-gray-300 rounded outline-0' name="usertype" id="usertype">
-                <option value="student">Student</option>
-                <option value="teacher">Teacher</option>
-              </select>
-            </div>
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Full Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Full name" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <div className='mb-5'>
-              <label className='block mb-2 font-semibold' htmlFor="name">Full name</label>
-              <div className='flex align-middle gap-3 w-full px-4 py-2 bg-gray-300 rounded outline-0'>
-                <div className='h-full flex align-bottom'>
-                  <i className='bxrds  bx-user'></i>
-                </div>
-                <input type="text" id="name" name="name" placeholder='Full name' />
-              </div>
-              {state?.errors?.name && <p className='text-red-400'>{state.errors.name}</p>}
-            </div>
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter your email" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <div className='mb-5'>
-              <label className='block mb-2 font-semibold' htmlFor="email">Email</label>
-              <div className='flex align-middle gap-3 w-full px-4 py-2 bg-gray-300 rounded outline-0'>
-                <div className='h-full flex align-bottom'>
-                  <i className='bxrds  bx-envelope'    ></i>
-                </div>
-                <input id="email" name="email" type="email" placeholder='Enter your email' />
-              </div>
-              {state?.errors?.email && <p className='text-red-400' >{state.errors.email}</p>}
-            </div>
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone number</FormLabel>
+                <FormControl>
+                  <Input placeholder="+234 XX XXXX XXXX" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input type="password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <div className='mb-5'>
-              <label className='block mb-2 font-semibold' htmlFor="phone">Phone number</label>
-              <div className='flex align-middle gap-3 w-full px-4 py-2 bg-gray-300 rounded outline-0'>
-                <div className='h-full flex align-bottom'>
-                  <i className='bxrds  bx-phone'    ></i>
-                </div>
-                <input type="tel" id='phone' name='phone' placeholder='+234 XX XXXX XXXX' />
-              </div>
-              {state?.errors?.phone && <p className='text-red-400' >{state.errors.phone}</p>}
-            </div>
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Confirm Password</FormLabel>
+                <FormControl>
+                  <Input type="password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
+          {/* Submit */}
+          <Button type="submit" disabled={pending} className="w-full">
+            {pending ? "Signing up…" : "Sign Up"}
+          </Button>
+          
+          {/* Optional: Show global error message */}
+          {state?.message && !state?.errors && (
+             <p className="text-red-500 text-center">{state.message}</p>
+          )}
 
-            <div className='mb-5'>
-              <label className='block mb-2 font-semibold' htmlFor="password">Password</label>
-              <div className='flex align-middle gap-3 w-full px-4 py-2 bg-gray-300 rounded outline-0'>
-                <div className='h-full flex align-bottom'>
-                  <i className='bxrds bx-lock h-fit'></i>
-                </div>
-                <input id="password" name="password" type="password" />
-              </div>
-              {state?.errors?.password && (
-                <div className='text-red-400 flex'>
-                  <p>Password must:</p>
-                  <ul>
-                    {state.errors.password.map((error) => (
-                      <li key={error}>- {error}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label className='block mb-2 font-semibold' htmlFor="confirm-password">Confirm Password</label>
-              <div className='flex align-middle gap-3 w-full px-4 py-2 bg-gray-300 rounded outline-0'>
-                <div className='h-full flex align-bottom'>
-                  <i className='bxrds bx-lock h-fit'></i>
-                </div>
-                <input id='confirm-password' name='confirm-password' type="password" />
-              </div>
-            </div>
-
-            <div className='text-sm my-4 flex justify-between'>
-              <label htmlFor=""><input type="checkbox" /> Remember me</label>
-
-              <a href="">Forgot Password?</a>
-            </div>
-
-            <div className='my-8'>
-              <button disabled={pending} type="submit" className='block w-full text-center text-white bg-black p-2 rounded-lg mb-5'>
-                Sign in
-              </button>
-
-              <button className='flex justify-center w-full gap-3 border p-2 rounded-lg'>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8.36055 0.789433C5.96258 1.62131 3.89457 3.20024 2.46029 5.29431C1.026 7.38838 0.301037 9.8872 0.391883 12.4237C0.482728 14.9603 1.38459 17.4008 2.96501 19.3869C4.54543 21.373 6.72109 22.8 9.17243 23.4582C11.1598 23.971 13.2419 23.9935 15.2399 23.5238C17.0499 23.1173 18.7233 22.2476 20.0962 21.0001C21.5251 19.662 22.5622 17.9597 23.0962 16.0763C23.6765 14.0282 23.7798 11.8743 23.3981 9.78006H12.2381V14.4094H18.7012C18.572 15.1478 18.2952 15.8525 17.8873 16.4814C17.4795 17.1102 16.9489 17.6504 16.3274 18.0694C15.5382 18.5915 14.6485 18.9428 13.7156 19.1007C12.7798 19.2747 11.82 19.2747 10.8843 19.1007C9.93591 18.9046 9.03874 18.5132 8.24993 17.9513C6.98271 17.0543 6.0312 15.7799 5.53118 14.3101C5.02271 12.8127 5.02271 11.1893 5.53118 9.69193C5.8871 8.64234 6.47549 7.68669 7.25243 6.89631C8.14154 5.97521 9.26718 5.3168 10.5058 4.99333C11.7445 4.66985 13.0484 4.6938 14.2743 5.06256C15.232 5.35654 16.1078 5.87019 16.8318 6.56256C17.5606 5.83756 18.2881 5.11068 19.0143 4.38193C19.3893 3.99006 19.7981 3.61693 20.1674 3.21568C19.0622 2.1872 17.765 1.38691 16.3499 0.860683C13.7731 -0.0749616 10.9536 -0.100106 8.36055 0.789433Z" fill="white" />
-                  <path d="M8.3607 0.789367C10.9536 -0.100776 13.7731 -0.0762934 16.3501 0.858742C17.7654 1.38855 19.062 2.19269 20.1657 3.22499C19.7907 3.62624 19.3951 4.00124 19.0126 4.39124C18.2851 5.11749 17.5582 5.84124 16.832 6.56249C16.1079 5.87012 15.2321 5.35648 14.2745 5.06249C13.0489 4.69244 11.7451 4.66711 10.5061 4.98926C9.26712 5.31141 8.14079 5.96861 7.2507 6.88874C6.47377 7.67912 5.88538 8.63477 5.52945 9.68437L1.64258 6.67499C3.03384 3.91604 5.44273 1.80566 8.3607 0.789367Z" fill="#E33629" />
-                  <path d="M0.611157 9.65605C0.820072 8.62067 1.16691 7.61798 1.64241 6.6748L5.52928 9.69168C5.02081 11.1891 5.02081 12.8124 5.52928 14.3098C4.23428 15.3098 2.93866 16.3148 1.64241 17.3248C0.452064 14.9554 0.0890305 12.2557 0.611157 9.65605Z" fill="#F8BD00" />
-                  <path d="M12.2381 9.77832H23.3981C23.7799 11.8726 23.6766 14.0264 23.0963 16.0746C22.5623 17.958 21.5252 19.6602 20.0963 20.9983C18.8419 20.0196 17.5819 19.0483 16.3275 18.0696C16.9494 17.6501 17.4802 17.1094 17.8881 16.4798C18.296 15.8503 18.5726 15.1448 18.7013 14.4058H12.2381C12.2363 12.8646 12.2381 11.3214 12.2381 9.77832Z" fill="#587DBD" />
-                  <path d="M1.64062 17.3251C2.93687 16.3251 4.2325 15.3201 5.5275 14.3101C6.02851 15.7804 6.98138 17.0549 8.25 17.9513C9.04127 18.5106 9.94037 18.8988 10.89 19.0913C11.8257 19.2653 12.7855 19.2653 13.7213 19.0913C14.6542 18.9334 15.5439 18.5821 16.3331 18.0601C17.5875 19.0388 18.8475 20.0101 20.1019 20.9888C18.7292 22.237 17.0558 23.1073 15.2456 23.5144C13.2476 23.9841 11.1655 23.9616 9.17813 23.4488C7.60632 23.0291 6.13814 22.2893 4.86563 21.2757C3.51874 20.2063 2.41867 18.8588 1.64062 17.3251Z" fill="#319F43" />
-                </svg>
-
-                <span>Login with Google</span>
-              </button>
-            </div>
-
-
-            <div className='flex justify-center gap-3'>
-              <p>Don't have an account?</p>
-
-              <a className='font-semibold' href="">Sign up here</a>
-            </div>
-
-          </form>
-
-        </div>
-
-      </div>
+        </form>
+      </Form>
     </div>
-  )
+  );
 }
-
-export default SignUp

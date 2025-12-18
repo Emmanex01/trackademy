@@ -2,36 +2,55 @@
 import { getUser } from "@/lib/dal";
 import prisma from "@/lib/prisma";
 import { redirect } from 'next/navigation';
-import { toast } from "react-toastify";
+import { revalidatePath } from "next/cache";
 
 export async function enrollCourse(courseId: string) {
-  const user = await getUser();
-  
-  // Keep strict auth redirects on the server
-  if (!user) redirect('/login'); 
-  if (user.role !== "STUDENT") return { status: 'error', message: 'Only Student Are Allowed to Enroll Into a Course.' };
+  try {
+    const user = await getUser();
+    
+    if (!user) redirect('/login'); 
+    if (user.role !== "STUDENT") {
+      return { status: 'error', message: 'Only Students are allowed to enroll.' };
+    }
 
-  const student = await prisma.student.findUnique({
-    where: { userId: user.id },
-    select: { id: true },
-  });
+    const student = await prisma.student.findUnique({
+      where: { userId: user.id },
+      select: { id: true },
+    });
 
-  if (!student) return { status: 'error', message: 'You cannot be found in the DB' };
+    if (!student) {
+      return { status: 'error', message: 'Student profile not found.' };
+    }
 
-  const existing = await prisma.enrollment.findFirst({
-    where: { studentId: student.id, courseId },
-  });
+    // 1. Verify the course actually exists first
+    const course = await prisma.course.findUnique({
+      where: { id: courseId }
+    });
+    if (!course) return { status: 'error', message: 'Course not found.' };
 
-  // CHANGE STARTS HERE
-  if (existing) {
-    // Return state instead of toasting/redirecting immediately
-    return { status: 'info', message: 'You are already enrolled in this course.' };
+    // 2. Attempt to create the enrollment
+    // We rely on a Unique Constraint in the DB (studentId + courseId) 
+    // to prevent duplicates safely.
+    await prisma.enrollment.create({
+      data: { 
+        studentId: student.id, 
+        courseId 
+      },
+    });
+
+    // 3. Clear the cache so the UI updates immediately
+    revalidatePath(`/courses/${courseId}`);
+    revalidatePath('/dashboard');
+
+    return { status: 'success', message: 'Successfully enrolled!' };
+
+  } catch (error: any) {
+    // 4. Handle unique constraint violation (Prisma error P2002)
+    if (error.code === 'P2002') {
+      return { status: 'info', message: 'You are already enrolled in this course.' };
+    }
+
+    console.error("Enrollment error:", error);
+    return { status: 'error', message: 'An unexpected error occurred.' };
   }
-
-  await prisma.enrollment.create({
-    data: { studentId: student.id, courseId },
-  });
-  
-  // Return success status
-  return { status: 'success', message: 'Successfully enrolled!' };
 }
