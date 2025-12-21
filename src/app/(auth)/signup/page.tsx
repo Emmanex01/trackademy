@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect } from "react"; // Import useEffect
+import { startTransition, useActionState, useEffect } from "react"; // Import useEffect
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -79,7 +79,11 @@ export default function SignUp() {
   });
 
     // Manually trigger the server action
-    action(formData);
+    // 3. Wrap the server action call in startTransition
+    // This tells React to track the pending state of this async operation
+    startTransition(() => {
+      action(formData);
+    });
   };
 
   return (

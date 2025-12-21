@@ -77,9 +77,7 @@ export async function signup(
       errors: { general: ["Something went wrong. Please try again."] },
     };
   }
-
-  // Redirect or return success (Redirect must be outside try/catch)
-  redirect("/dashboard"); 
+  return { success: true };
 }
 
  
