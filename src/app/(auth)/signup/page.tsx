@@ -83,7 +83,10 @@ export default function SignUp() {
   };
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto px-4 py-10">
+      {/* Header Image Placeholder */}
+      <div className="mx-auto h-40 w-full max-w-lg bg-black mb-8 rounded-md" />
+      
       <h1 className="text-center text-4xl font-semibold">Join EduFlow</h1>
 
       <Form {...form}>
