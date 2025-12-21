@@ -27,6 +27,8 @@ const buttonVariants = cva(
         icon: "size-9",
         "icon-sm": "size-8",
         "icon-lg": "size-10",
+        // 👇 This line fixes your build error
+        xs: "h-7 rounded-md px-2 text-xs", 
       },
     },
     defaultVariants: {
