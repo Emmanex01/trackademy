@@ -59,7 +59,7 @@ const commonMenu = [
             <span className='lg:hidden text-xl'>EF</span>
         </Link>
       </div>
-      <div className='flex flex-col gap-2 font-semibold'>
+      <div className='flex h-screen flex-col justify-between gap-2 font-semibold'>
         {menuList.map((item, index) => {
             const pathName = usePathname();
             const isActive = pathName === item.link;

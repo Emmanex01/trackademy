@@ -25,24 +25,43 @@ const Profile = ({ userProfile}: Props) => {
     const [isEditing, setIsEditing] = useState(false);
   return (
     <div>
-          <header className='mb-4'>
-            <div className='flex justify-between mb-2'>
-                <h1 className='font-medium text-4xl'>My Profile</h1>
-                <div className='flex items-center gap-2'>
-                <div className='flex items-center rounded-lg p-2 gap-1'>
-                    <button onClick={() => setIsEditing(true)} className='btn btn-neutral'>
-                        <Edit size={16}/>
-                        <span className='text-sm'>Edit Profile</span>
-                    </button>
-                </div>
-                <Link href='/notification' className='bg-gray-300 p-2 rounded-full relative '>
-                    <Bell/>
-                    <span className='absolute w-5 h-5 text-sm flex items-center justify-center -top-1 -right-1 rounded-full bg-red-400'>0</span>
+    <header className='mb-6'>
+        {/* 
+        1. flex-col: Stacks title and buttons vertically on mobile
+        2. md:flex-row: Aligns them horizontally on desktop 
+        3. gap-4: Adds space between title and buttons when stacked
+        */}
+        <div className='flex flex-col gap-4 md:flex-row md:justify-between md:items-center mb-2'>
+            
+            {/* Title: Smaller text (2xl) on mobile, larger (4xl) on desktop */}
+            <h1 className='font-medium text-2xl md:text-4xl'>My Profile</h1>
+            
+            {/* Actions Group */}
+            <div className='flex items-center gap-3'>
+                {/* Edit Button */}
+                {/* Added btn-sm for mobile to save space, md:btn-md for desktop */}
+                <button 
+                    onClick={() => setIsEditing(true)} 
+                    className='btn btn-neutral btn-sm md:btn-md flex items-center gap-2'
+                >
+                    <Edit size={16}/>
+                    <span className='text-xs md:text-sm'>Edit Profile</span>
+                </button>
+
+                {/* Notification Icon */}
+                {/* Added shrink-0 so it doesn't get squashed */}
+                <Link 
+                    href='/notification' 
+                    className='bg-gray-300 p-2 rounded-full relative shrink-0 hover:bg-gray-400 transition-colors'
+                >
+                    <Bell size={20}/>
+                    <span className='absolute w-4 h-4 text-[10px] flex items-center justify-center -top-1 -right-1 rounded-full bg-red-400 text-white'>0</span>
                 </Link>
-                </div>
             </div>
-            <p className='text-sm'>Manage your account settings and personal information</p>
-        </header>
+        </div>
+        
+        <p className='text-sm text-gray-500'>Manage your account settings and personal information</p>
+    </header>
           <div className='h-screen flex flex-col md:flex-row gap-2'>
           <div className='w-full md:w-1/3 text-center'>
             <div className='bg-gray-900 flex flex-col items-center text-white  gap-6 py-12'>
